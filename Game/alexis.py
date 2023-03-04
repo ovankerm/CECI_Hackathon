@@ -3,7 +3,8 @@ import time
 from typing import List
 import pygame
 import sys
-
+from classes import Car
+from speedometer import Speedometer
 WINDOW_WIDTH = 1024
 WINDOW_HEIGHT = 768
 
@@ -96,7 +97,7 @@ class GameWindow:
         self.dt = 0
 
         # background
-        self.background_image = pygame.image.load("Images/bg.png").convert_alpha()
+        self.background_image = pygame.image.load("bg.png").convert_alpha()
         self.background_image = pygame.transform.scale(
             self.background_image, (WINDOW_WIDTH, self.background_image.get_height())
         )
@@ -117,7 +118,7 @@ class GameWindow:
         self.sprites: List[pygame.Surface] = []
         print(self.sprites)
         for i in range(1, 8):
-           self.sprites.append(pygame.image.load(f"Images/tree.png").convert_alpha())
+           self.sprites.append(pygame.image.load(f"tree.png").convert_alpha())
         
     def run(self):
 
@@ -182,6 +183,12 @@ class GameWindow:
             if keys[pygame.K_TAB]:
                 speed *= 2  # it has to be N integer times the segment length
             pos += speed
+
+                # Draw the speed counter
+            # font = pygame.font.SysFont("comicsansms", 100)
+            # speed_text = font.render("Speed: " + str(speed), True, (255, 255, 255))
+            # self.window_surface.blit(speed_text, (30, 30))
+            
 
             # loop the circut from start to finish
             while pos >= N * segL:

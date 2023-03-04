@@ -2,6 +2,7 @@ from classes import Car
 import numpy as np
 from matplotlib import pyplot as plt
 import pygame
+from speedometer import Speedometer
 
 size = width, height = 480, 480
 
@@ -36,8 +37,10 @@ while not done:
     Car1.update_state(dt)
 
     print(Car1.speed)
+    
 
     pygame.draw.circle(screen, [255, 255, 255], [width/2 + Car1.pos[0], height/2], 10)
-    
+    speedometer = Speedometer(Car1, width, width)
+    speedometer.render(screen)
     pygame.display.flip()
 

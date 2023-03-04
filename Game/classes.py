@@ -7,6 +7,7 @@ class Car:
         self.pos = np.zeros(2)
         self.speed = 0
         self.orientation = 0
+        self.top_speed = 100
 
     def accelerate(self, acc, dt):
         self.speed += acc * dt
