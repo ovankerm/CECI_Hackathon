@@ -1,4 +1,5 @@
 from classes import Car
+import scene as sc
 import numpy as np
 from matplotlib import pyplot as plt
 import pygame
@@ -11,16 +12,16 @@ done = False
 clock = pygame.time.Clock()
 
 Car1 = Car()
-Car1.set_speed(100)
+Car1.set_speed(500)
 Car1.set_orientation(-np.radians(90))
+
+window = sc.GameWindow(screen, clock)
 
 while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: done = True
 
     dt = clock.tick(60) * 1e-3
-    screen.fill([0, 0, 0])
-
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_LEFT]:
@@ -30,14 +31,12 @@ while not done:
     else:
         Car1.turn(-0.05 * np.rad2deg(Car1.orientation + np.pi/2))
 
-    if(abs(Car1.pos[0] > 10)):
-       Car1.accelerate(-10, dt)
+    window.draw_scene(dt, Car1.pos, Car1.speed)
+
+    # if(abs(Car1.pos[0] > 10)):
+    #    Car1.accelerate(-10, dt)
 
     Car1.update_state(dt)
-
-    print(Car1.speed)
-
-    pygame.draw.circle(screen, [255, 255, 255], [width/2 + Car1.pos[0], height/2], 10)
     
     pygame.display.flip()
 
