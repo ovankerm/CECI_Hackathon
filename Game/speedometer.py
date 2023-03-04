@@ -20,6 +20,7 @@ class Speedometer:
         self.needle_color = pg.Color("#1f51ff")
 
     def render(self, screen):
+        print(self.screen_x, self.screen_y)
         screen.blit(self.image, (self.screen_x, self.screen_y))
 
         angle = pi * self.car.speed / self.car.top_speed

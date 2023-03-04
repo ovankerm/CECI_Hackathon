@@ -11,7 +11,7 @@ screen = pygame.display.set_mode(size)
 done = False
 clock = pygame.time.Clock()
 
-Car1 = Car()
+Car1 = Car(1, width, height)
 Car1.set_speed(100)
 Car1.set_orientation(-np.radians(90))
 
@@ -35,10 +35,8 @@ while not done:
        Car1.accelerate(-10, dt)
 
     Car1.update_state(dt)
-
-    print(Car1.speed)
+    Car1.render(screen)
     
-
     pygame.draw.circle(screen, [255, 255, 255], [width/2 + Car1.pos[0], height/2], 10)
     speedometer = Speedometer(Car1, width, width)
     speedometer.render(screen)
