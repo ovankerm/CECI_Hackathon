@@ -9,7 +9,7 @@ class Speedometer:
         speedometer_width = screen_width / 4
         speedometer_height = screen_height / 4
 
-        self.image = pg.transform.smoothscale(pg.image.load("speedometer.png"), (speedometer_width, speedometer_height)).convert_alpha()
+        self.image = pg.transform.smoothscale(pg.image.load("Images/speedometer.png"), (speedometer_width, speedometer_height)).convert_alpha()
 
         self.screen_x = screen_width - (speedometer_width)
         self.screen_y = screen_height - (speedometer_height)
