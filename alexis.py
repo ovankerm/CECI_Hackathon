@@ -96,7 +96,7 @@ class GameWindow:
         self.dt = 0
 
         # background
-        self.background_image = pygame.image.load("bg.png").convert_alpha()
+        self.background_image = pygame.image.load("Images/bg.png").convert_alpha()
         self.background_image = pygame.transform.scale(
             self.background_image, (WINDOW_WIDTH, self.background_image.get_height())
         )
@@ -117,7 +117,7 @@ class GameWindow:
         self.sprites: List[pygame.Surface] = []
         print(self.sprites)
         for i in range(1, 8):
-           self.sprites.append(pygame.image.load(f"tree.png").convert_alpha())
+           self.sprites.append(pygame.image.load(f"Images/tree.png").convert_alpha())
         
     def run(self):
 
