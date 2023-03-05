@@ -8,25 +8,26 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 
-mp_hand = mp.solutions.hands
-hands = mp_hand.Hands(max_num_hands=4)
-mp_drawing_utils = mp.solutions.drawing_utils
+class hands_detection_utils:
+    def __init__(self, cap):
+        self.cap = cap
+        self.mp_hand = mp.solutions.hands
+        self.hands = self.mp_hand.Hands(max_num_hands=4)
+        self.mp_drawing_utils = mp.solutions.drawing_utils
+        self.treshold = 20
+        self.waitKey = 10
+
+        self.counter = [0, 0, 0]
+
+
 
 def analyze_img(cap, treshold = 20, wait_time = 10):
-    """
-    :param cap: VideoCapture cap = cv2.VideoCapture(0)
-    :param treshold: Number of images necessary to validate the choice
-    :param wait_time: Waiting time between each itration of the loop
-    :return: Number of players validated, 1 or 2 (0 if error)
-    """
     prev_time = time.time() # Used for FPS calculation
     finger_counter = np.zeros(3)
     while cap.isOpened():
-        success, img = cap.read()
-        if not success:
-            return 0
 
-        process_img_fingers(img, finger_counter)
+
+        process_single_img_fingers(img, finger_counter)
         # print(finger_counter)
 
 
@@ -42,11 +43,14 @@ def analyze_img(cap, treshold = 20, wait_time = 10):
             return 2
 
         cv2.putText(img, f"{FPS} FPS", (50, 450), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 10)
-        cv2.imshow("Image", img)
-        cv2.waitKey(wait_time)  # Waits wait_time ms
 
-def process_img_fingers(img, counter):
-    hand_processed = hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+def process_single_img_fingers(hdu: hands_detection_utils):
+    success, img = hdu.cap.read()
+    img = cv2.flip(img, 1)
+    if not success:
+        return 0
+
+    hand_processed = hdu.hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     all_hand_landmarks = hand_processed.multi_hand_landmarks
 
     if all_hand_landmarks:
@@ -55,18 +59,17 @@ def process_img_fingers(img, counter):
             handLabel = hand_processed.multi_handedness[handIndex].classification[0].label
 
             # Add points to diplayed img
-            mp_drawing_utils.draw_landmarks(img, single_hand_landmark, mp_hand.HAND_CONNECTIONS)
+            hdu.mp_drawing_utils.draw_landmarks(img, single_hand_landmark, hdu.mp_hand.HAND_CONNECTIONS)
 
             # Labels = ["Right", "Left"]
             # Attention a cause de la webcam, les mains sont inversées
-            if handLabel == "Left":
+            if handLabel == "Right":
                 single_hand_landmark_xyz = single_hand_landmark.landmark
-                # print(single_hand_landmark_xyz[0])
 
                 if single_hand_landmark_xyz[4].y > single_hand_landmark_xyz[1].y:
-                    counter[0] = 0
-                    counter[1] = 0
-                    counter[2] += 1
+                    hdu.counter[0] = 0
+                    hdu.counter[1] = 0
+                    hdu.counter[2] += 1
                 else:
                     # Check if Ring finger or Pinky is down
                     if not (single_hand_landmark_xyz[16].y < single_hand_landmark_xyz[14].y or single_hand_landmark_xyz[
@@ -77,19 +80,20 @@ def process_img_fingers(img, counter):
 
                             # Check if middle finger is up
                             if single_hand_landmark_xyz[12].y < single_hand_landmark_xyz[10].y:
-                                counter[0] = 0
-                                counter[1] += 1
-                                counter[2] = 0
+                                hdu.counter[0] = 0
+                                hdu.counter[1] += 1
+                                hdu.counter[2] = 0
                             else:
-                                counter[0] += 1
-                                counter[1] = 0
-                                counter[2] = 0
+                                hdu.counter[0] += 1
+                                hdu.counter[1] = 0
+                                hdu.counter[2] = 0
 
                     else:
-                        counter[0] = 0
-                        counter[1] = 0
-                        counter[2] = 0
-
+                        hdu.counter[0] = 0
+                        hdu.counter[1] = 0
+                        hdu.counter[2] = 0
+    cv2.imshow("Image", img)
+    cv2.waitKey(hdu.waitKey)
 
 
 
@@ -136,7 +140,7 @@ def hand_to_jump(cap, list_func, treshold = 20, wait_time = 10):
 
     while cap.isOpened():
         success, img = cap.read()
-        # img = cv2.GaussianBlur(img, (15, 15), 0)
+        img = cv2.flip(img, 1)
         if not success:
             return 0
         hand_processed = hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
@@ -154,7 +158,7 @@ def hand_to_jump(cap, list_func, treshold = 20, wait_time = 10):
                 handLabel = hand_processed.multi_handedness[handIndex].classification[0].label
 
                 # Only looking at left hands
-                if handLabel == "Right":
+                if handLabel == "Left":
                     left_hand_present = True
                     # Add points to diplayed img
                     mp_drawing_utils.draw_landmarks(img, single_hand_landmark, mp_hand.HAND_CONNECTIONS)
