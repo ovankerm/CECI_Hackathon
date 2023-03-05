@@ -43,18 +43,32 @@ class Window():
         
     def draw_road(self, player_position):
         initial_index = int(player_position[1]//10) - 2
-        for i in range(50):
-            color = grass[(initial_index + i)%2]
-            points = [[-2000, 0, 10 * (initial_index + i)], [-2000, 0, 10 * (initial_index + i) + 10], [2000, 0, 10 * (initial_index + i) + 10], [2000, 0, 10 * (initial_index + i)]]
-            self.draw_shape(points, color)
+        # for i in range(50):
+        #     color = grass[(initial_index + i)%2]
+        #     points = [[-2000, 0, 10 * (initial_index + i)], [-2000, 0, 10 * (initial_index + i) + 10], [2000, 0, 10 * (initial_index + i) + 10], [2000, 0, 10 * (initial_index + i)]]
+        #     self.draw_shape(points, color)
 
+        #     color = rumble[(initial_index + i)%2]
+        #     points = [[-110, 0, 10 * (initial_index + i)], [-110, 0, 10 * (initial_index + i) + 10], [110, 0, 10 * (initial_index + i) + 10], [110, 0, 10 * (initial_index + i)]]
+        #     self.draw_shape(points, color)
+
+        #     color = road[(initial_index + i)%2]
+        #     points = [[-100, 0, 10 * (initial_index + i)], [-100, 0, 10 * (initial_index + i) + 10], [100, 0, 10 * (initial_index + i) + 10], [100, 0, 10 * (initial_index + i)]]
+        #     self.draw_shape(points, color)
+
+        color = grass[0]
+        points = [[-2000, 0, 10 * (initial_index)], [-2000, 0, 10 * (initial_index + 50)], [2000, 0, 10 * (initial_index + 50)], [2000, 0, 10 * (initial_index)]]
+        self.draw_shape(points, color)
+
+        for i in range(50):
             color = rumble[(initial_index + i)%2]
             points = [[-110, 0, 10 * (initial_index + i)], [-110, 0, 10 * (initial_index + i) + 10], [110, 0, 10 * (initial_index + i) + 10], [110, 0, 10 * (initial_index + i)]]
             self.draw_shape(points, color)
 
-            color = road[(initial_index + i)%2]
-            points = [[-100, 0, 10 * (initial_index + i)], [-100, 0, 10 * (initial_index + i) + 10], [100, 0, 10 * (initial_index + i) + 10], [100, 0, 10 * (initial_index + i)]]
-            self.draw_shape(points, color)
+        color = road[0]
+        points = [[-100, 0, 10 * (initial_index)], [-100, 0, 10 * (initial_index + 50)], [100, 0, 10 * (initial_index + 50)], [100, 0, 10 * (initial_index)]]
+        self.draw_shape(points, color)
+
 
     def draw_obstacle(self, obstacle : cl.Obstacle):
         for face in obstacle.get_faces(self.camera.x):

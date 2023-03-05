@@ -13,8 +13,8 @@ class face_detection_utils:
         self.facelandmark_processor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
         self.min_AR_eye = 0.2
         self.min_AR_mouth = 0.76
-        self.treshold = 10
-        self.waitKey = 10
+        self.treshold = 1
+        self.waitKey = 1
 
         success, img = cap.read()
         img_height, self.img_width, _ = img.shape
@@ -36,8 +36,7 @@ class hands_detection_utils:
         self.hands = self.mp_hand.Hands(max_num_hands=4)
         self.mp_drawing_utils = mp.solutions.drawing_utils
         self.treshold = 20
-        self.waitKey = 10
-
+        self.waitKey = 1
         self.counter = [0, 0, 0]
 
 
@@ -120,8 +119,8 @@ def face_detector_singleIMG_multi(fdu: face_detection_utils):
 
     # print([fdu.l_eye_counter, fdu.l_mouth_counter, fdu.r_eye_counter, fdu.r_mouth_counter])
 
-    cv2.line(img, (fdu.half_img_width, 0), (fdu.half_img_width, fdu.img_height), (0, 0, 255), 5)
-    cv2.imshow("Image", img)
+    # cv2.line(img, (fdu.half_img_width, 0), (fdu.half_img_width, fdu.img_height), (0, 0, 255), 5)
+    # cv2.imshow("Image", img)
     cv2.waitKey(fdu.waitKey)
 
 
@@ -132,6 +131,8 @@ def face_detector_singleplayer(fdu: face_detection_utils):
 
 def face_detector_singleIMG_single(fdu: face_detection_utils):
     success, img = fdu.cap.read()
+    img = img[180:540:2, 426:852:2]
+    print(img.shape)
     if not success:
         return 0
     img = cv2.flip(img, 1)
@@ -163,7 +164,7 @@ def face_detector_singleIMG_single(fdu: face_detection_utils):
         fdu.result[0][0] = fdu.l_eye_counter >= fdu.treshold
         fdu.result[0][1] = fdu.l_mouth_counter >= fdu.treshold
 
-    cv2.imshow("Image", img)
+    # cv2.imshow("Image", img)
     cv2.waitKey(fdu.waitKey)
 
 def process_single_img_fingers(hdu: hands_detection_utils):

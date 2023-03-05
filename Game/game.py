@@ -17,6 +17,9 @@ import concurrent
 from selectors import DefaultSelector, EVENT_READ
 selector = DefaultSelector()
 
+size = width, height = 1024, 512
+screen = pygame.display.set_mode(size)
+
 def get_devices():
     devs = []
     for path in evdev.list_devices():
