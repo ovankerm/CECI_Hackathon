@@ -2,8 +2,8 @@ import pygame
 import numpy as np
 import classes as cl
 
-dark_grass = pygame.Color(0, 154, 0)
-light_grass = pygame.Color(16, 200, 16)
+dark_grass = pygame.Color(231,196,150)
+light_grass = pygame.Color(236,204,162)
 white_rumble = pygame.Color(255, 255, 255)
 red_rumble = pygame.Color(255, 0, 0)
 dark_road = pygame.Color(105, 105, 105)
@@ -45,7 +45,7 @@ class Window():
         initial_index = int(player_position[1]//10) - 2
         for i in range(50):
             color = grass[(initial_index + i)%2]
-            points = [[-1000, 0, 10 * (initial_index + i)], [-1000, 0, 10 * (initial_index + i) + 10], [1000, 0, 10 * (initial_index + i) + 10], [1000, 0, 10 * (initial_index + i)]]
+            points = [[-2000, 0, 10 * (initial_index + i)], [-2000, 0, 10 * (initial_index + i) + 10], [2000, 0, 10 * (initial_index + i) + 10], [2000, 0, 10 * (initial_index + i)]]
             self.draw_shape(points, color)
 
             color = rumble[(initial_index + i)%2]
@@ -78,9 +78,12 @@ class Window():
         self.draw_shape([[-100, 0, z_pos], [-100, 100, z_pos], [-110, 100, z_pos], [-110, 0, z_pos]], (111, 76, 15))
         self.draw_shape([[100, 0, z_pos], [110, 0, z_pos], [110, 100, z_pos], [100, 100, z_pos]], (111, 76, 15))
 
+    def draw_background(self):
+        to_draw = pygame.transform.scale(pygame.image.load("Images/background.jpg"), (self.width, self.width/2))
+        self.screen.blit(to_draw, (self.orig_x, self.orig_y))
+
     def draw_scene(self, car, obstacles, visible_obstacles, speedometer, finish):
-        pygame.draw.rect(self.screen, (105, 205, 4), pygame.Rect(self.orig_x, self.orig_y, self.width, self.height))
-        
+        self.draw_background()
         self.camera.x = car.pos[0]
         self.camera.y = 100
         self.camera.z = car.pos[1] - 30.01

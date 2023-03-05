@@ -32,8 +32,10 @@ class Car:
 
     def accelerate(self, acc, dt):
         self.speed += acc * dt
-        if self.speed >self.top_speed:
-             self.speed = self.top_speed
+        if self.speed > self.top_speed:
+            self.speed = self.top_speed
+        if self.speed < 10:
+            self.speed = 10
 
     def set_speed(self, speed):
         self.speed = speed
@@ -75,18 +77,18 @@ class Car:
             self.turn(-0.05 * np.rad2deg(self.orientation - np.pi/2))
             self.orientation_bool = 0
 
-        if keys[controls[2]]:
-            self.accelerate(10, dt)
-        elif keys[controls[3]]:
+        if keys[controls[2]] and not self.jumping:
+            self.accelerate(15, dt)
+        elif keys[controls[3]] and not self.jumping:
             self.accelerate(-50, dt)
 
         if keys[pygame.K_SPACE] and not self.jumping:
             self.t = 0
             self.jumping = True
-            self.speed -= 50
+            self.speed = max(self.speed - 50, 0)
 
         if(abs(self.pos[0]) > 100):
-            self.accelerate(-20, dt)
+            self.accelerate(-70, dt)
 
 class Speedometer:
     def __init__(self, car, screen_width, screen_height):
