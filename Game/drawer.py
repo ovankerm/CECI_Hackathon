@@ -63,10 +63,10 @@ class Window():
     def draw_speedometer(self, speedometer : cl.Speedometer):
         self.screen.blit(speedometer.image, (speedometer.screen_x, speedometer.screen_y))
 
-        angle = np.pi * speedometer.car.speed / speedometer.car.top_speed
+        angle = np.pi * speedometer.car.speed / speedometer.car.top_speed -0.6
         tip_x = speedometer.needle_x - speedometer.needle_length * np.cos(angle)
         tip_y = speedometer.needle_y - speedometer.needle_length * np.sin(angle)
-        pygame.draw.line(self.screen, speedometer.needle_color, (speedometer.needle_x, speedometer.needle_y), (tip_x, tip_y), 3)
+        pygame.draw.line(self.screen, speedometer.needle_color, (speedometer.needle_x, speedometer.needle_y), (tip_x, tip_y), 2)
 
     def draw_adversary(self, car_self : cl.Car, car_adversaire : cl.Car):
         if(car_self.pos[1] < car_adversaire.pos[1] + 30 and car_adversaire.pos[1]-car_self.pos[1] < 500):
