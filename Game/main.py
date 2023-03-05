@@ -9,7 +9,7 @@ screen = pygame.display.set_mode(size)
 done = False
 clock = pygame.time.Clock()
 
-n_players = 2
+n_players = 1
 
 Cars = np.empty(n_players, dtype=cl.Car)
 Windows = np.empty(n_players, dtype=Window)

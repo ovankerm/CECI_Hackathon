@@ -15,10 +15,18 @@ class Car:
         self.index = index
         self.top_speed = 300
         self.orientation_bool = 0
-        self.width = 200 / 5.1
+        self.width = 200 / 6
+        if index == 0:
+            self.aspect_ratio = 162/293
+            self.height = (int) (self.width*162/293)
+        else :
+            self.aspect_ratio = 153/277
+            self.height = (int) (self.width*153/277)
 
     def accelerate(self, acc, dt):
         self.speed += acc * dt
+        if self.speed >self.top_speed:
+             self.speed = self.top_speed
 
     def set_speed(self, speed):
         self.speed = speed
