@@ -75,8 +75,8 @@ class Speedometer:
     def __init__(self, car, screen_width, screen_height):
         self.car = car
 
-        speedometer_width = screen_width / 4
-        speedometer_height = screen_height / 4
+        speedometer_width = screen_width / 6
+        speedometer_height = screen_height / 6
 
         self.image = pygame.transform.smoothscale(pygame.image.load("Images/speedometer.png"), (speedometer_width, speedometer_height)).convert_alpha()
 
