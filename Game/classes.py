@@ -82,7 +82,7 @@ class Car:
         elif keys[controls[3]] and not self.jumping:
             self.accelerate(-50, dt)
 
-        if keys[pygame.K_SPACE] and not self.jumping:
+        if keys[controls[4]] and not self.jumping:
             self.t = 0
             self.jumping = True
             self.speed = max(self.speed - 50, 0)
@@ -117,39 +117,57 @@ def check_collision(car : Car, obstacle):
 
 
 class Obstacle:
-    def __init__(self, length, z_pos, x_pos, speed_multiplier, color):
+    def __init__(self, length, z_pos, x_pos, speed_multiplier, color,type):
         self.length = length
         self.z_pos = z_pos
         self.x_pos = x_pos
         self.middle_x = -100 + (x_pos + length/2) * 40
-        self.vertices = [[-100 + x_pos * 40, 0, z_pos - 5],
-                         [-100 + x_pos * 40, 0, z_pos + 5],
-                         [-100 + (x_pos + length) * 40, 0, z_pos + 5],
-                         [-100 + (x_pos + length) * 40, 0, z_pos - 5],
-                         [-100 + x_pos * 40, 1, z_pos - 5],
-                         [-100 + x_pos * 40, 1, z_pos + 5],
-                         [-100 + (x_pos + length) * 40, 1, z_pos + 5],
-                         [-100 + (x_pos + length) * 40, 1, z_pos - 5]]
+        self.type = type
+        # self.vertices = [[-100 + x_pos * 40, 0, z_pos - 5],
+        #                  [-100 + x_pos * 40, 0, z_pos + 5],
+        #                  [-100 + (x_pos + length) * 40, 0, z_pos + 5],
+        #                  [-100 + (x_pos + length) * 40, 0, z_pos - 5],
+        #                  [-100 + x_pos * 40, 1, z_pos - 5],
+        #                  [-100 + x_pos * 40, 1, z_pos + 5],
+        #                  [-100 + (x_pos + length) * 40, 1, z_pos + 5],
+        #                  [-100 + (x_pos + length) * 40, 1, z_pos - 5]]
+        if(self.type == 'oil'):
+            self.vertices = [[-100 + x_pos * 40, 0, z_pos],
+                            [-100 + x_pos * 40 + 10, 0, z_pos - 5],
+                            [self.middle_x, 0, z_pos - 4],
+                            [-100 + (x_pos + length) * 40 - 10, 0, z_pos - 5],
+                            [-100 + (x_pos + length) * 40, 0, z_pos],
+                            [-100 + (x_pos + length) * 40 - 10, 0, z_pos + 5],
+                            [self.middle_x, 0, z_pos + 4],
+                            [-100 + x_pos * 40 + 10, 0, z_pos + 5]]
+        elif(self.type == "boost"):
+            self.vertices = [[-100 + x_pos * 40, 0, z_pos-5],
+                            [-100 + x_pos * 40 + 20, 0, z_pos],
+                            [-100 + (x_pos + 1) * 40, 0, z_pos - 5],
+                            [-100 + (x_pos + 1) * 40, 0, z_pos],
+                            [-100 + x_pos * 40 + 20, 0, z_pos + 5],
+                            [-100 + x_pos * 40, 0, z_pos]]
         self.collided = [False, False]
         self.speed_multiplier = speed_multiplier
         self.color = color
         
     def get_faces(self, camera_x):
-        if(camera_x < self.middle_x):
-            return [[self.vertices[0], self.vertices[3], self.vertices[7], self.vertices[4]],
-                    [self.vertices[0], self.vertices[4], self.vertices[5], self.vertices[1]],
-                    [self.vertices[4], self.vertices[7], self.vertices[6], self.vertices[5]]]
-        else :
-            return [[self.vertices[0], self.vertices[3], self.vertices[7], self.vertices[4]],
-                    [self.vertices[3], self.vertices[2], self.vertices[6], self.vertices[7]],
-                    [self.vertices[4], self.vertices[7], self.vertices[6], self.vertices[5]]]
+        # if(camera_x < self.middle_x):
+        #     return [[self.vertices[0], self.vertices[3], self.vertices[7], self.vertices[4]],
+        #             [self.vertices[0], self.vertices[4], self.vertices[5], self.vertices[1]],
+        #             [self.vertices[4], self.vertices[7], self.vertices[6], self.vertices[5]]]
+        # else :
+        #     return [[self.vertices[0], self.vertices[3], self.vertices[7], self.vertices[4]],
+        #             [self.vertices[3], self.vertices[2], self.vertices[6], self.vertices[7]],
+        #             [self.vertices[4], self.vertices[7], self.vertices[6], self.vertices[5]]]
+        return([self.vertices])
 
 def generate_random_obstacle(last_z):
     x_pos = random.randrange(5)
     z_pos = last_z + 200 + random.uniform(-30, 30)
     boost = 6 * random.random() < 1
     if(boost):
-        return Obstacle(1, z_pos, x_pos, 1.5, (255, 0, 255))
+        return Obstacle(1, z_pos, x_pos, 1.5, (255, 0, 255), "boost")
     length = random.randrange(1, 6 - x_pos)
-    return Obstacle(length, z_pos, x_pos, 0.5, (0, 0, 0))
+    return Obstacle(length, z_pos, x_pos, 0.5, (0, 0, 0), "oil")
 

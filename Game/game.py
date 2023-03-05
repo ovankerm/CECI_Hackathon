@@ -26,8 +26,8 @@ def run(return_value, screen, width, height):
     visible_obstacles = np.zeros((n_players, 2), dtype=int)
     Speedometers = np.empty(n_players, dtype=cl.Speedometer)
 
-    Controls = [[pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN],
-            [pygame.K_q, pygame.K_d, pygame.K_z, pygame.K_s]]
+    Controls = [[pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN, pygame.K_SPACE],
+            [pygame.K_q, pygame.K_d, pygame.K_z, pygame.K_s, pygame.K_TAB]]
 
     for i in range(n_players):
         Cars[i] = cl.Car(i)
@@ -84,6 +84,8 @@ def run(return_value, screen, width, height):
                 if cl.check_collision(car, obstacles[visible_obstacles[i, 0]]) :
                     car.speed *= obstacles[visible_obstacles[i, 0]].speed_multiplier
             Windows[i].draw_scene(car, obstacles, visible_obstacles[i,:], Speedometers[i], finish)
+            if(n_players == 2):
+                Windows[i].draw_adversary(car, Cars[(i+1)%2])
             if(car.pos[1] >= finish):
                 winner = i
                 done = True
