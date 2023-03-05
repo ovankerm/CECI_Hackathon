@@ -80,8 +80,6 @@ def main1():
         if not success:
             raise Exception
 
-        img = cv2.GaussianBlur(img, (15, 15), 0)
-
         process_img_fingers(img, finger_counter)
         # print(finger_counter)
 
