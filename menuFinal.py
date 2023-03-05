@@ -61,16 +61,12 @@ def rectangle(x_rel, y_rel, filling, screen, text):
         pygame.time.wait(20)"""
 
 
-def main1():
-    cap = cv2.VideoCapture(0)
-
-    treshold = 30
+def menus(cap, texts):
+    treshold = 40
 
     prev_time = time.time()  # Used for FPS calculation
 
-    finger_counter = np.zeros(2)
-
-
+    finger_counter = np.zeros(3)
 
     while cap.isOpened():
         success, img = cap.read()
@@ -80,10 +76,12 @@ def main1():
         process_img_fingers(img, finger_counter)
         # print(finger_counter)
 
+        screen.fill((0, 0, 60))
+
         draw_text("Choose number of players", TEXT_COLOR, 0.5, 0.4)
-        rectangle(0.25, 0.65, finger_counter[0]/treshold, screen, "1 PLAYER")
-        rectangle(0.75, 0.65, finger_counter[1]/treshold, screen, "2 PLAYERS")
-        rectangle(0.5, 0.9, 0, screen, "EXIT")
+        rectangle(0.25, 0.65, finger_counter[0]/treshold, screen, texts[0])
+        rectangle(0.75, 0.65, finger_counter[1]/treshold, screen, texts[1])
+        rectangle(0.5, 0.9, finger_counter[2]/treshold, screen, texts[2])
         pygame.display.update()
         #pygame.time.wait(20)
 
@@ -93,11 +91,14 @@ def main1():
         prev_time = cur_time
 
         if finger_counter[0] >= treshold:
-            print(1)
-            break
+            # One player validated
+            return 1
         elif finger_counter[1] >= treshold:
-            print(2)
-            break
+            # Two players validated
+            return 2
+        elif finger_counter[2] >= treshold:
+            # Exit menu
+            return 0
 
         # print(FPS)
 
@@ -108,82 +109,33 @@ def main1():
     cap.release()
     cv2.destroyAllWindows()
 
-
-def multiprocess(screen):
-    #finger_counter = np.zeros(2)
-    finger_counter = multiprocessing.Array("i", 2)
-    #global prev_time
-    #prev_time = time.time()
-
-
-    # print(analyze_img(cap, treshold=50, wait_time=1))
-
-    treshold = 30
-    # Used for FPS calculation
-
-    p1 = multiprocessing.Process(target=img_func, args=(finger_counter,))
-    p2 = multiprocessing.Process(target=menu_func, args=(treshold,screen,))
-
-    #menu_func(treshold)
-
-    p1.start()
-    p2.start()
-
-    p1.join()
-    p2.join()
-
-    cap.release()
-    cv2.destroyAllWindows()
-
-
-
-
-
-
-
-
-
-def img_func(finger_counter):
-    cap = cv2.VideoCapture(0)
-    prev_time = time.time()
-
-    while True:
-        success, img = cap.read()
-        if not success:
-            raise Exception
-
-        process_img_fingers(img, finger_counter)
-
-        # FPS counter
-        cur_time = time.time()
-        FPS = int(1 / (cur_time - prev_time))
-        prev_time = cur_time
-
-        cv2.putText(img, f"{FPS} FPS", (50, 450), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 10)
-        cv2.imshow("Image", img)
-        cv2.waitKey(1)
-
-
-def menu_func(treshold, screen):
-    finger_counter = np.zeros(2)
-
-
-
-    while True:
-        one, two = finger_counter
-        draw_text("Choose number of players", TEXT_COLOR, 0.5, 0.4)
-        rectangle(0.25, 0.65, one / treshold, screen, "1 PLAYER")
-        rectangle(0.75, 0.65, two / treshold, screen, "2 PLAYERS")
-        rectangle(0.5, 0.9, 0, screen, "EXIT")
-        pygame.display.flip()
-        pygame.time.wait(50)
-        if one >= treshold:
-            print(1)
-            break
-        elif two >= treshold:
-            print(2)
-            break
+def menu_one_player():
+    pass
 
 
 if __name__ == "__main__":
-    main1()
+    cap = cv2.VideoCapture(0)
+    start_texts = ["1 PLAYER", "2 PLAYERS", "EXIT"]
+    one_player_texts = ["CHRONO", "RANDOM MODE", "BACK"]
+    result = 0
+    while True:
+        start = menus(cap, start_texts)
+        if start == 1:
+            one = menus(cap, one_player_texts)
+            if one == 1:
+                print("CHRONO")
+                result = 11
+                break
+            elif one == 2:
+                print("RANDOM")
+                result = 12
+                break
+            elif one==0:
+                continue
+        elif start == 2:
+            print("TWO PLAYER GAME")
+            result = 2
+            break
+        else:
+            print("END GAME")
+            break

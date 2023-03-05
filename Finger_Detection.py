@@ -4,6 +4,9 @@ import cv2
 import mediapipe as mp
 import time
 import numpy as np
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
+
 
 mp_hand = mp.solutions.hands
 hands = mp_hand.Hands(max_num_hands=4)
@@ -17,7 +20,7 @@ def analyze_img(cap, treshold = 20, wait_time = 10):
     :return: Number of players validated, 1 or 2 (0 if error)
     """
     prev_time = time.time() # Used for FPS calculation
-    finger_counter = np.zeros(2)
+    finger_counter = np.zeros(3)
     while cap.isOpened():
         success, img = cap.read()
         if not success:
@@ -58,26 +61,34 @@ def process_img_fingers(img, counter):
             # Attention a cause de la webcam, les mains sont inversées
             if handLabel == "Left":
                 single_hand_landmark_xyz = single_hand_landmark.landmark
-                print(single_hand_landmark_xyz[0])
+                # print(single_hand_landmark_xyz[0])
 
-                # Check if Ring finger or Pinky is down
-                if not (single_hand_landmark_xyz[16].y < single_hand_landmark_xyz[14].y or single_hand_landmark_xyz[
-                    20].y < single_hand_landmark_xyz[18].y):
-
-                    # Check if index is up
-                    if single_hand_landmark_xyz[8].y < single_hand_landmark_xyz[6].y:
-
-                        # Check if middle finger is up
-                        if single_hand_landmark_xyz[12].y < single_hand_landmark_xyz[10].y:
-                            counter[0] = 0
-                            counter[1] += 1
-                        else:
-                            counter[0] += 1
-                            counter[1] = 0
-
-                else:
+                if single_hand_landmark_xyz[4].y > single_hand_landmark_xyz[1].y:
                     counter[0] = 0
                     counter[1] = 0
+                    counter[2] += 1
+                else:
+                    # Check if Ring finger or Pinky is down
+                    if not (single_hand_landmark_xyz[16].y < single_hand_landmark_xyz[14].y or single_hand_landmark_xyz[
+                        20].y < single_hand_landmark_xyz[18].y):
+
+                        # Check if index is up
+                        if single_hand_landmark_xyz[8].y < single_hand_landmark_xyz[6].y:
+
+                            # Check if middle finger is up
+                            if single_hand_landmark_xyz[12].y < single_hand_landmark_xyz[10].y:
+                                counter[0] = 0
+                                counter[1] += 1
+                                counter[2] = 0
+                            else:
+                                counter[0] += 1
+                                counter[1] = 0
+                                counter[2] = 0
+
+                    else:
+                        counter[0] = 0
+                        counter[1] = 0
+                        counter[2] = 0
 
 
 
@@ -187,9 +198,11 @@ def hand_to_jump(cap, list_func, treshold = 20, wait_time = 10):
         cv2.imshow("Image", img)
         cv2.waitKey(10)
 
+
+
 if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
-    print(hand_to_jump(cap, 20, 10))
+    print(analyze_img(cap, 100, 10))
 
 
 
