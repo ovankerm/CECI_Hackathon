@@ -1,6 +1,6 @@
 import numpy as np
 import random
-import pygame as pg
+import pygame
 
 MIN_ORIENTATION = np.radians(60)
 MAX_ORIENTATION = np.radians(120)
@@ -23,6 +23,9 @@ class Car:
             self.aspect_ratio = 153/277
             self.height = (int) (self.width*153/277)
         self.finished = False
+        
+        self.my_image = pygame.image.load("Images/back_gt40_{}.png".format(self.index))
+        self.for_adversary = pygame.image.load("Images/back_gt40_{}_1.png".format(self.index))
 
     def accelerate(self, acc, dt):
         self.speed += acc * dt
@@ -76,7 +79,7 @@ class Speedometer:
         speedometer_width = screen_width / 4
         speedometer_height = screen_height / 4
 
-        self.image = pg.transform.smoothscale(pg.image.load("Images/speedometer.png"), (speedometer_width, speedometer_height)).convert_alpha()
+        self.image = pygame.transform.smoothscale(pygame.image.load("Images/speedometer.png"), (speedometer_width, speedometer_height)).convert_alpha()
 
         self.screen_x = screen_width - (speedometer_width)
         self.screen_y = screen_height - (speedometer_height)
@@ -84,7 +87,7 @@ class Speedometer:
         self.needle_x = screen_width - (speedometer_width / 2)
         self.needle_y = screen_height - 20
         self.needle_length = speedometer_height / 1.7
-        self.needle_color = pg.Color("#1f51ff")
+        self.needle_color = pygame.Color("#1f51ff")
 
 
 
@@ -93,6 +96,7 @@ def check_collision(car : Car, obstacle):
         obstacle.collided[car.index] = True
         return True
     return False
+
 
 class Obstacle:
     def __init__(self, length, z_pos, x_pos, speed_multiplier, color):

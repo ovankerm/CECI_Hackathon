@@ -68,6 +68,11 @@ class Window():
         tip_y = speedometer.needle_y - speedometer.needle_length * np.sin(angle)
         pygame.draw.line(self.screen, speedometer.needle_color, (speedometer.needle_x, speedometer.needle_y), (tip_x, tip_y), 3)
 
+    def draw_adversary(self, car_self : cl.Car, car_adversaire : cl.Car):
+        if(car_self.pos[1] < car_adversaire.pos[1] + 30 and car_adversaire.pos[1]-car_self.pos[1] < 500):
+            self.draw_car(car_adversaire, True)
+
+
     def draw_finish(self, z_pos):
         self.draw_shape([[-100, 80, z_pos], [100, 80, z_pos], [100, 100, z_pos], [-100, 100, z_pos]], (111, 76, 15))
         self.draw_shape([[-100, 0, z_pos], [-100, 100, z_pos], [-110, 100, z_pos], [-110, 0, z_pos]], (111, 76, 15))
@@ -99,14 +104,16 @@ class Window():
             self.draw_finish(finish)
         
         self.draw_speedometer(speedometer)
-        self.draw_car(car)
+        self.draw_car(car, False)
 
-    def draw_car(self, car: cl.Car):
+    def draw_car(self, car: cl.Car, adversary : bool):
         bottom_right = self.project((car.pos[0] + car.width/2, 0, car.pos[1]))
         top_left = self.project((car.pos[0] - car.width/2, car.width*car.aspect_ratio/self.vert_scale, car.pos[1]))
-
-        car.back = pygame.transform.rotate(pygame.transform.smoothscale(pygame.image.load("Images/back_gt40_{}.png".format(car.index)), (bottom_right[0] - top_left[0], bottom_right[1] - top_left[1])), 5 * car.orientation_bool).convert_alpha()
-        self.screen.blit(car.back, top_left)
+        if not adversary:
+            to_draw = pygame.transform.rotate(pygame.transform.smoothscale(car.my_image, (bottom_right[0] - top_left[0], bottom_right[1] - top_left[1])), 5 * car.orientation_bool).convert_alpha()
+        else:
+            to_draw = pygame.transform.rotate(pygame.transform.smoothscale(car.for_adversary, (bottom_right[0] - top_left[0], bottom_right[1] - top_left[1])), 5 * car.orientation_bool).convert_alpha()
+        self.screen.blit(to_draw, top_left)
 
 
         

@@ -50,7 +50,7 @@ while not done:
     keys = pygame.key.get_pressed()
 
     screen.fill((105, 205, 4))
-
+    
     for i, car in enumerate(Cars):
         car.get_input(keys, dt, Controls[i])
         car.update_state(dt)
@@ -58,10 +58,13 @@ while not done:
             if cl.check_collision(car, obstacles[visible_obstacles[i, 0]]) :
                 car.speed *= obstacles[visible_obstacles[i, 0]].speed_multiplier
         Windows[i].draw_scene(car, obstacles, visible_obstacles[i,:], Speedometers[i], finish)
+        if (n_players==2):
+            Windows[i].draw_adversary(car, Cars[(i+1)%2])
         if(car.pos[1] >= finish):
             winner = i
             done = True
             print("Winner is car number %d, with a time of %.2f seconds!!!"%(i+1,time))
+        
 
     img = font.render("%.2f"%time, True, (0, 0, 255))
     screen.blit(img, (20, 20))
