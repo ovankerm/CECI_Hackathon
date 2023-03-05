@@ -7,10 +7,11 @@ MAX_ORIENTATION = np.radians(120)
 average_obstacle_distance = 200
 
 class Car:
-    def __init__(self):
+    def __init__(self, index):
         self.pos = np.zeros(2)
         self.speed = 0
         self.orientation = 0
+        self.index = index
 
     def accelerate(self, acc, dt):
         self.speed += acc * dt
@@ -35,10 +36,26 @@ class Car:
         self.pos[0] += np.cos(self.orientation) * self.speed * dt 
         self.pos[1] += np.sin(self.orientation) * self.speed * dt
 
+    def get_input(self, keys, dt, left, right, up, down):
+        if keys[left]:
+            self.turn(1)
+        elif keys[right]:
+            self.turn(-1)
+        else:
+            self.turn(-0.05 * np.rad2deg(self.orientation - np.pi/2))
+
+        if keys[up]:
+            self.accelerate(10, dt)
+        elif keys[down]:
+            self.accelerate(-50, dt)
+
+        if(abs(self.pos[0]) > 100):
+            self.accelerate(-20, dt)
+
 def check_collision(car : Car, obstacles, visible_obstacles):
     for i in range(visible_obstacles[0], visible_obstacles[1]):
-        if(not obstacles[i].collided and abs(car.pos[0] - obstacles[i].middle_x) < obstacles[i].length * 20 and abs(car.pos[1] - obstacles[i].z_pos) < 10):
-            obstacles[i].collided = True
+        if(not obstacles[i].collided[car.index] and abs(car.pos[0] - obstacles[i].middle_x) < obstacles[i].length * 20 and abs(car.pos[1] - obstacles[i].z_pos) < 10):
+            obstacles[i].collided[car.index] = True
             return True
     return False
 
@@ -56,7 +73,7 @@ class Obstacle:
                          [-100 + x_pos * 40, 1, z_pos + 5],
                          [-100 + (x_pos + length) * 40, 1, z_pos + 5],
                          [-100 + (x_pos + length) * 40, 1, z_pos - 5]]
-        self.collided = False
+        self.collided = [False, False]
         self.speed_multiplier = speed_multiplier
         self.color = color
         

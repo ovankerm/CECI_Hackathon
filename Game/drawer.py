@@ -21,15 +21,18 @@ class Camera():
         self.f = f
 
 class Window():
-    def __init__(self, screen, width, height):
+    def __init__(self, screen, width, height, orig_x, orig_y, vert_scale):
         self.screen = screen
         self.width = width
         self.height = height
         self.camera = Camera(0, 0, 0, 100)
+        self.orig_x = orig_x
+        self.orig_y = orig_y
+        self.vert_scale = vert_scale
 
     def project(self, point):
-        u = self.camera.f * (point[0] - self.camera.x)/(point[2] - self.camera.z) + self.width/2
-        v = -self.camera.f * (point[1] - self.camera.y)/(point[2] - self.camera.z) + self.height/2
+        u = self.camera.f * (point[0] - self.camera.x)/(point[2] - self.camera.z) + self.width/2 + self.orig_x
+        v = (-self.camera.f * (point[1] - self.camera.y)/(point[2] - self.camera.z) + self.height/2) * self.vert_scale + self.orig_y
         return(u, v,)
     
     def draw_shape(self, points, color):
@@ -59,6 +62,8 @@ class Window():
 
 
     def draw_scene(self, player_position, obstacles, visible_obstacles):
+        pygame.draw.rect(self.screen, (105, 205, 4), pygame.Rect(self.orig_x, self.orig_y, self.width, self.height))
+        
         self.camera.x = player_position[0]
         self.camera.y = 50
         self.camera.z = player_position[1] - 30.01

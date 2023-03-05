@@ -10,16 +10,23 @@ size = width, height = 1024, 768
 screen = pygame.display.set_mode(size)
 done = False
 clock = pygame.time.Clock()
-Car1 = cl.Car()
+
+Car1 = cl.Car(0)
 Car1.set_speed(200)
 Car1.set_orientation(np.radians(90))
 
-window = Window(screen, width, height)
+Car2 = cl.Car(1)
+Car2.set_speed(200)
+Car2.set_orientation(np.radians(90))
+
+window1 = Window(screen, width, height, 0, 0, 0.5)
+window2 = Window(screen, width, height, 0, height/2, 0.5)
 
 last_obstacle_z = 400
 n_obstacles = 100
 obstacles = np.empty(n_obstacles, dtype=cl.Obstacle)
-visible_obstacles = [0, 0]
+visible_obstacles1 = [0, 0]
+visible_obstacles2 = [0, 0]
 
 for i in range(n_obstacles):
     o = cl.generate_random_obstacle(last_obstacle_z)
@@ -33,34 +40,26 @@ font = pygame.font.SysFont(pygame.font.get_default_font(), 50)
 while not done:
     dt = clock.tick(60) * 1e-3
     time += dt
-
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_LEFT]:
-        Car1.turn(1)
-    elif keys[pygame.K_RIGHT]:
-        Car1.turn(-1)
-    else:
-        Car1.turn(-0.05 * np.rad2deg(Car1.orientation - np.pi/2))
-
-    if keys[pygame.K_UP]:
-        Car1.accelerate(10, dt)
-    elif keys[pygame.K_DOWN]:
-        Car1.accelerate(-50, dt)
-
-    if(abs(Car1.pos[0] > 100)):
-       Car1.accelerate(-20, dt)
-
+    Car1.get_input(keys, dt, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN)
     Car1.update_state(dt)
+
+    Car2.get_input(keys, dt, pygame.K_q, pygame.K_d, pygame.K_z, pygame.K_s)
+    Car2.update_state(dt)
 
     screen.fill((105, 205, 4))
 
+    if cl.check_collision(Car1, obstacles, visible_obstacles1) :
+        Car1.speed *= obstacles[visible_obstacles1[0]].speed_multiplier
+    if cl.check_collision(Car2, obstacles, visible_obstacles2) :
+        Car2.speed *= obstacles[visible_obstacles2[0]].speed_multiplier
+
+    window1.draw_scene(Car1.pos, obstacles, visible_obstacles1)
+    window2.draw_scene(Car2.pos, obstacles, visible_obstacles2)
+
     img = font.render("%.2f"%time, True, (0, 0, 255))
     screen.blit(img, (20, 20))
-
-    if cl.check_collision(Car1, obstacles, visible_obstacles) :
-        Car1.speed *= obstacles[visible_obstacles[0]].speed_multiplier
-    window.draw_scene(Car1.pos, obstacles, visible_obstacles)
     
     pygame.display.flip()
 
