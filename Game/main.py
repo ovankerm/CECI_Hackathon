@@ -3,6 +3,7 @@ from drawer import Window
 import numpy as np
 from matplotlib import pyplot as plt
 import pygame
+from speedometer import Speedometer
 
 
 
@@ -61,6 +62,9 @@ while not done:
     img = font.render("%.2f"%time, True, (0, 0, 255))
     screen.blit(img, (20, 20))
     
+    pygame.draw.circle(screen, [255, 255, 255], [width/2 + Car1.pos[0], height/2], 10)
+    speedometer = Speedometer(Car1, width, width)
+    speedometer.render(screen)
     pygame.display.flip()
 
     for event in pygame.event.get():
