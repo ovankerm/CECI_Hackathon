@@ -3,9 +3,6 @@ from drawer import Window
 import numpy as np
 from matplotlib import pyplot as plt
 import pygame
-from speedometer import Speedometer
-
-
 
 size = width, height = 1024, 768
 screen = pygame.display.set_mode(size)
