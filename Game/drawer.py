@@ -107,12 +107,13 @@ class Window():
         self.draw_car(car, False)
 
     def draw_car(self, car: cl.Car, adversary : bool):
-        bottom_right = self.project((car.pos[0] + car.width/2, 0, car.pos[1]))
-        top_left = self.project((car.pos[0] - car.width/2, car.width*car.aspect_ratio/self.vert_scale, car.pos[1]))
+        bottom_right = self.project((car.pos[0] + car.width/2, car.pos[2], car.pos[1]))
+        top_left = self.project((car.pos[0] - car.width/2, car.pos[2] + car.width*car.aspect_ratio/self.vert_scale, car.pos[1]))
         if not adversary:
             to_draw = pygame.transform.rotate(pygame.transform.smoothscale(car.my_image, (bottom_right[0] - top_left[0], bottom_right[1] - top_left[1])), 5 * car.orientation_bool).convert_alpha()
         else:
             to_draw = pygame.transform.rotate(pygame.transform.smoothscale(car.for_adversary, (bottom_right[0] - top_left[0], bottom_right[1] - top_left[1])), 5 * car.orientation_bool).convert_alpha()
+            to_draw.set_alpha(128)
         self.screen.blit(to_draw, top_left)
 
 

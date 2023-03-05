@@ -9,7 +9,7 @@ average_obstacle_distance = 200
 
 class Car:
     def __init__(self, index):
-        self.pos = np.zeros(2)
+        self.pos = np.zeros(3)
         self.speed = 0
         self.orientation = 0
         self.index = index
@@ -23,9 +23,12 @@ class Car:
             self.aspect_ratio = 153/277
             self.height = (int) (self.width*153/277)
         self.finished = False
-        
         self.my_image = pygame.image.load("Images/back_gt40_{}.png".format(self.index))
         self.for_adversary = pygame.image.load("Images/back_gt40_{}_1.png".format(self.index))
+        self.dt = 1
+        self.t = 0
+        self.jumping = False
+        self.g = 100
 
     def accelerate(self, acc, dt):
         self.speed += acc * dt
@@ -52,6 +55,14 @@ class Car:
     def update_state(self, dt):
         self.pos[0] += np.cos(self.orientation) * self.speed * dt 
         self.pos[1] += np.sin(self.orientation) * self.speed * dt
+        if(self.jumping):
+            self.t += dt
+            if(self.t <= self.dt):
+                self.pos[2] = self.g/2 * self.t * (self.dt - self.t)
+            else:
+                self.jumping = False
+                self.pos[2] = 0
+
 
     def get_input(self, keys, dt, controls):
         if keys[controls[0]]:
@@ -68,6 +79,11 @@ class Car:
             self.accelerate(10, dt)
         elif keys[controls[3]]:
             self.accelerate(-50, dt)
+
+        if keys[pygame.K_SPACE] and not self.jumping:
+            self.t = 0
+            self.jumping = True
+            self.speed -= 50
 
         if(abs(self.pos[0]) > 100):
             self.accelerate(-20, dt)
@@ -92,7 +108,7 @@ class Speedometer:
 
 
 def check_collision(car : Car, obstacle):
-    if(not obstacle.collided[car.index] and abs(car.pos[0] - obstacle.middle_x) < obstacle.length * 20 and abs(car.pos[1] - obstacle.z_pos) < 10):
+    if(not obstacle.collided[car.index] and not car.jumping and abs(car.pos[0] - obstacle.middle_x) < obstacle.length * 20 and abs(car.pos[1] - obstacle.z_pos) < 10):
         obstacle.collided[car.index] = True
         return True
     return False

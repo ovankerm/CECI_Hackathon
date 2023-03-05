@@ -9,7 +9,7 @@ screen = pygame.display.set_mode(size)
 done = False
 clock = pygame.time.Clock()
 
-n_players = 2
+n_players = 1
 
 Cars = np.empty(n_players, dtype=cl.Car)
 Windows = np.empty(n_players, dtype=Window)
@@ -30,7 +30,7 @@ for i in range(n_players):
 
 
 last_obstacle_z = 400
-n_obstacles = 5
+n_obstacles = 40
 obstacles = np.empty(n_obstacles, dtype=cl.Obstacle)
 
 for i in range(n_obstacles):
