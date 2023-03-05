@@ -8,14 +8,19 @@ import asyncio
 import evdev
 import sys
 import concurrent
+
+
+
 time = 0
-size = width, height = 1024, 768
+size = width, height = 1024, 512
 screen = pygame.display.set_mode(size)
 done = False
 clock = pygame.time.Clock()
 pygame.font.init()
 font = pygame.font.SysFont(pygame.font.get_default_font(), 50)
 
+from selectors import DefaultSelector, EVENT_READ
+selector = DefaultSelector()
 
 def get_devices():
     devs = []
@@ -56,7 +61,7 @@ class TurnState:
 class AccelerateState:
     def __init__(self, value, tol=0.01) -> None:
         self.value = value
-        self.action = ActionType.GAS
+        self.action = ActionType.BREAK
         self.tol = tol
     def update(self, value):
         if value:
@@ -74,36 +79,65 @@ class AccelerateState:
         # self.value = value
 
 
-async def print_events(device, i: int, turn: TurnState, acc: AccelerateState,\
-                       Cars: np.ndarray[Car], Windows: np.ndarray, Speedometers: np.ndarray, finish, obstacles, visible_obstacles):
+def print_events(devs, turn_acc, Cars: np.ndarray[Car], Windows: np.ndarray, Speedometers: np.ndarray, finish, obstacles, visible_obstacles):
                     #clock, font, screen):
-    # turn, acc = obj[device]
-    async for event in device.async_read_loop():
-            code = event.code
-            type = event.type
-            value = event.value
-            type_code = (type, code)
-            dt = clock.tick(60) * 1e-3
-            if type_code in event_types:
-                global time
+    global time
+    counter = -100000
+    n_players = len(devs)
+    prev_events = [[] for _ in range(n_players)]
+    while True:
+        dt = clock.tick(60) * 1e-3
+        events = [[] for _ in range(n_players)]
+        if counter % 5 == 0:
+            for key, mask in selector.select():
+                device = key.fileobj
+                i = hash(device.name) % len(devs)
+                turn, acc = turn_acc[i]
+                turn_actions = []
+                accelerate_actions = []
+                for event in device.read():
+                    code = event.code
+                    type = event.type
+                    value = event.value
+                    type_code = (type, code)
+                    event_type = event_types.get(type_code, None)
+                    if event_type == None: 
+                        continue
+                    if event_type == "ABS_WHEEL":
+                        turn_actions.append((event_type, value))
+                    if event_type == "BTN_TR":
+                        accelerate_actions.append((event_type, value))
+                if len(turn_actions) > 0: 
+                    events[i].append(turn_actions[-1])
+                if len(accelerate_actions) > 0:
+                    s = sum([v for t, v in accelerate_actions])
+                    events[i].append(("BTN_TR", s))
+                prev_events = events
+        else:
+            events = prev_events
+        global time
+        time += dt
+        for i in range(n_players):
+            for j in range(len(events[i])):
+                turn, acc = turn_acc[i]
                 time += dt
-                event_type = event_types[type_code]
+                event_type = events[i][j][0]
+                value = events[i][j][1] 
                 action = Action()
+                print(event_type)
                 if event_type == "ABS_WHEEL":
                     deg = turn.update(value)
                     action.update(turn.action, deg)
                     print(i, turn.action, acc.action, deg)
 
                 elif event_type == "BTN_TR":
-                    acc.update(value)
+                    acc.update(True)
                     action.update(acc.action, 1)
                     print(i, turn.action, acc.action)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT: sys.exit(0)
-                # keys = pygame.key.get_pressed()
                 screen.fill((105, 205, 4))
                 
-                # for i, car in enumerate(Cars):
                 car = Cars[i]
                 car.controller_input(dt, action)
                 car.update_state(dt)
@@ -112,8 +146,8 @@ async def print_events(device, i: int, turn: TurnState, acc: AccelerateState,\
                         car.speed *= obstacles[visible_obstacles[i, 0]].speed_multiplier
                 Windows[i].draw_scene(car, obstacles, visible_obstacles[i,:], Speedometers[i], finish)
                 n_players  = len(Cars)
-                if (n_players==2):
-                    Windows[i].draw_adversary(car, Cars[(i+1)%2])
+                # if (n_players==2):
+                #     Windows[i].draw_adversary(car, Cars[(i+1)%2])
                 if(car.pos[1] >= finish):
                     winner = i
                     done = True
@@ -123,23 +157,13 @@ async def print_events(device, i: int, turn: TurnState, acc: AccelerateState,\
                 img = font.render("%.2f"%time, True, (0, 0, 255))
                 screen.blit(img, (20, 20))
                 pygame.display.flip()
-
-                # if keys[pygame.K_LEFT]:
-                    
-                # elif keys[pygame.K_RIGHT]:
-                #     Car1.turn(-1)
-                # else:
-                #     Car1.turn(-0.05 * np.rad2deg(Car1.orientation - np.pi/2))
-
-def make_tick():
-    global clock
-    clock.tick(60) * 1e-3
+            counter+=1
 
 def main():
 
     devs = get_devices()
     n_players = len(devs)
-
+    print(n_players)
     Cars = np.empty(n_players, dtype=Car)
     Windows = np.empty(n_players, dtype=Window)
     visible_obstacles = np.zeros((n_players, 2), dtype=int)
@@ -153,10 +177,10 @@ def main():
         Cars[i].set_speed(200)
         Cars[i].set_orientation(np.radians(90))
 
-        Windows[i] = Window(screen, width, height, 0, i * height/n_players, 1/n_players)
+        Windows[i] = Window(screen, width, height, 0, i * height/(n_players*2), 1/n_players)
 
         Speedometers[i] = Speedometer(Cars[i], width, height)
-    last_obstacle_z = 400
+    last_obstacle_z = 4000
     n_obstacles = 5
     obstacles = np.empty(n_obstacles, dtype=Obstacle)
 
@@ -166,25 +190,14 @@ def main():
         obstacles[i] = o
 
     finish = obstacles[-1].z_pos + 200
+    turn_acc = []
     for i, dev in enumerate(devs):
         turn = TurnState(1)
         acc = AccelerateState(1)
+        selector.register(dev, EVENT_READ)
+        turn_acc.append((turn, acc))
         # obj[device] = (turn, acc)
-        asyncio.ensure_future(print_events(dev, i, turn, acc, Cars, Windows, Speedometers, finish, obstacles, visible_obstacles))
-    # asyncio.ensure_future(make_tick())
-    print(devs)
-    # for i, device in enumerate(devs):
-    loop = asyncio.get_event_loop()
-    # with concurrent.futures.ProcessPoolExecutor() as pool:
-    #         result = await loop.run_in_executor(
-    #             pool, make_tick)
-    #         print('custom process pool', result)
-    # result = await loop.run_in_executor(
-    #     None, )
-    # print('default thread pool', result)
-    # loop = asyncio.get_event_loop()
-    loop.run_forever()
-
+    print_events(devs, turn_acc, Cars, Windows, Speedometers, finish, obstacles, visible_obstacles)
 
 if __name__ == "__main__":
     main()
