@@ -66,7 +66,7 @@ class Car:
                 self.pos[2] = 0
 
 
-    def get_input(self, keys, dt, controls):
+    def get_input(self, keys, dt, controls, fdu, check_jump):
         if keys[controls[0]]:
             self.turn(1)
             self.orientation_bool = 1
@@ -82,10 +82,11 @@ class Car:
         elif keys[controls[3]] and not self.jumping:
             self.accelerate(-50, dt)
 
-        if keys[controls[4]] and not self.jumping:
-            self.t = 0
-            self.jumping = True
-            self.speed = max(self.speed - 50, 0)
+        if check_jump:
+            if fdu.result[self.index][1] and not self.jumping:
+                self.t = 0
+                self.jumping = True
+                self.speed = max(self.speed - 50, 0)
 
         if(abs(self.pos[0]) > 100):
             self.accelerate(-70, dt)
