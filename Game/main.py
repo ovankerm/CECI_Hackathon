@@ -41,7 +41,7 @@ for i in range(n_obstacles):
 time = 0
 pygame.font.init()
 font = pygame.font.SysFont(pygame.font.get_default_font(), 50)
-
+print(Speedometers[1])
 while not done:
     dt = clock.tick(60) * 1e-3
     time += dt

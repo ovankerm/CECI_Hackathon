@@ -74,19 +74,19 @@ class Car:
 class Speedometer:
     def __init__(self, car, screen_width, screen_height):
         self.car = car
-
+        self.index = car.index
         speedometer_width = screen_width / 6
-        speedometer_height = screen_height / 6
+        speedometer_height = screen_height / 6 
 
         self.image = pygame.transform.smoothscale(pygame.image.load("Images/speedometer.png"), (speedometer_width, speedometer_height)).convert_alpha()
 
         self.screen_x = screen_width - (speedometer_width)
         self.screen_y = screen_height - (speedometer_height)
 
-        self.needle_x = screen_width - (speedometer_width / 2)
-        self.needle_y = screen_height - 20
-        self.needle_length = speedometer_height / 1.7
-        self.needle_color = pygame.Color("#1f51ff")
+        self.needle_x = screen_width - (speedometer_width/2)
+        self.needle_y = screen_height - (speedometer_height/2)+4
+        self.needle_length = speedometer_height / 3.0
+        self.needle_color = pygame.Color("red")
 
 
 
