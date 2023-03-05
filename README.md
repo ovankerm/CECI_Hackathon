@@ -7,22 +7,21 @@ Multiplayer retro racing game. Two versions exist.
 ## Android phone controllers version: 
 ### Control of the cars: 
 Both players :
- - slide the right button up to accelerate 
- - slide the right button down to slow down
+ - Push the right button up to accelerate 
  - Incline the phone right/left to turn right/left
  - Open your mouth wide to jump
 
 ## Keyboard controller version:
 ### Control of the cars: 
 By default player :
- - slide the right button up on the phone to accelerate
+ - Up key to accelerate
  - Left/Right to turn 
  - Down to slow down 
  - Open your mouth wide to jump
 Second (optioanl) player :
- - Up key to accelerate
- - Left/Right to turn 
- - Down to slow down 
+ - Z key to accelerate
+ - Q/D key to turn 
+ - S key to slow down 
  - Open your mouth wide to jump
 
 ## Both versions use the same menu:
@@ -35,7 +34,7 @@ If one Player :
 
 This game was developed during the Hackaton of March 4 and 5, 2023 organized by the CECI by the team "Les boucleurs de boucles". 
 The team is composed of:
-- Otis Van Kerm
 - Cyril Janosi
-- Alexis Victor
 - Daniel Mokeev
+- Otis Van Kerm
+- Alexis Victor
