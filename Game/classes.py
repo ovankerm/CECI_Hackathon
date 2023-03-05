@@ -22,6 +22,7 @@ class Car:
         else :
             self.aspect_ratio = 153/277
             self.height = (int) (self.width*153/277)
+        self.finished = False
 
     def accelerate(self, acc, dt):
         self.speed += acc * dt

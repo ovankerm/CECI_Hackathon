@@ -9,7 +9,7 @@ screen = pygame.display.set_mode(size)
 done = False
 clock = pygame.time.Clock()
 
-n_players = 1
+n_players = 2
 
 Cars = np.empty(n_players, dtype=cl.Car)
 Windows = np.empty(n_players, dtype=Window)
@@ -30,13 +30,15 @@ for i in range(n_players):
 
 
 last_obstacle_z = 400
-n_obstacles = 100
+n_obstacles = 5
 obstacles = np.empty(n_obstacles, dtype=cl.Obstacle)
 
 for i in range(n_obstacles):
     o = cl.generate_random_obstacle(last_obstacle_z)
     last_obstacle_z = o.z_pos
     obstacles[i] = o
+
+finish = obstacles[-1].z_pos + 200
 
 time = 0
 pygame.font.init()
@@ -52,9 +54,14 @@ while not done:
     for i, car in enumerate(Cars):
         car.get_input(keys, dt, Controls[i])
         car.update_state(dt)
-        if cl.check_collision(car, obstacles[visible_obstacles[i, 0]]) :
-            car.speed *= obstacles[visible_obstacles[i, 0]].speed_multiplier
-        Windows[i].draw_scene(car, obstacles, visible_obstacles[i,:], Speedometers[i])
+        if not car.finished:
+            if cl.check_collision(car, obstacles[visible_obstacles[i, 0]]) :
+                car.speed *= obstacles[visible_obstacles[i, 0]].speed_multiplier
+        Windows[i].draw_scene(car, obstacles, visible_obstacles[i,:], Speedometers[i], finish)
+        if(car.pos[1] >= finish):
+            winner = i
+            done = True
+            print("Winner is car number %d, with a time of %.2f seconds!!!"%(i+1,time))
 
     img = font.render("%.2f"%time, True, (0, 0, 255))
     screen.blit(img, (20, 20))

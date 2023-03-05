@@ -68,7 +68,12 @@ class Window():
         tip_y = speedometer.needle_y - speedometer.needle_length * np.sin(angle)
         pygame.draw.line(self.screen, speedometer.needle_color, (speedometer.needle_x, speedometer.needle_y), (tip_x, tip_y), 3)
 
-    def draw_scene(self, car, obstacles, visible_obstacles, speedometer):
+    def draw_finish(self, z_pos):
+        self.draw_shape([[-100, 80, z_pos], [100, 80, z_pos], [100, 100, z_pos], [-100, 100, z_pos]], (111, 76, 15))
+        self.draw_shape([[-100, 0, z_pos], [-100, 100, z_pos], [-110, 100, z_pos], [-110, 0, z_pos]], (111, 76, 15))
+        self.draw_shape([[100, 0, z_pos], [110, 0, z_pos], [110, 100, z_pos], [100, 100, z_pos]], (111, 76, 15))
+
+    def draw_scene(self, car, obstacles, visible_obstacles, speedometer, finish):
         pygame.draw.rect(self.screen, (105, 205, 4), pygame.Rect(self.orig_x, self.orig_y, self.width, self.height))
         
         self.camera.x = car.pos[0]
@@ -76,16 +81,22 @@ class Window():
         self.camera.z = car.pos[1] - 30.01
         self.draw_road(car.pos)
 
-        if(obstacles[visible_obstacles[0]].z_pos < self.camera.z + 5):
-            visible_obstacles[0] += 1
-        elif(obstacles[visible_obstacles[1]].z_pos < car.pos[1] + 500):
-            visible_obstacles[1] += 1
+        if(visible_obstacles[0] < len(obstacles)):
+            if(obstacles[visible_obstacles[0]].z_pos < self.camera.z + 5):
+                visible_obstacles[0] += 1
 
-        
-        print(visible_obstacles)
+        if(visible_obstacles[1] < len(obstacles)):
+            if obstacles[visible_obstacles[1]].z_pos < car.pos[1] + 500 :
+                visible_obstacles[1] += 1
+
+        if(visible_obstacles[0] == len(obstacles)): car.finished = True
+
 
         for i in range(visible_obstacles[0], min(visible_obstacles[1], len(obstacles))):
             self.draw_obstacle(obstacles[i])
+
+        if(finish - car.pos[1] < 500):
+            self.draw_finish(finish)
         
         self.draw_speedometer(speedometer)
         self.draw_car(car)
