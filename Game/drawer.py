@@ -68,6 +68,11 @@ class Window():
         tip_y = speedometer.needle_y - speedometer.needle_length * np.sin(angle)
         pygame.draw.line(self.screen, speedometer.needle_color, (speedometer.needle_x, speedometer.needle_y), (tip_x, tip_y), 3)
 
+    def draw_adversary(self, car_self : cl.Car, car_adversaire : cl.Car):
+        if(car_self.pos[1] < car_adversaire.pos[1] + 30 and car_adversaire.pos[1]-car_self.pos[1] < 500):
+            self.draw_car(car_adversaire, True)
+
+
     def draw_scene(self, car, obstacles, visible_obstacles, speedometer):
         pygame.draw.rect(self.screen, (105, 205, 4), pygame.Rect(self.orig_x, self.orig_y, self.width, self.height))
         
@@ -81,21 +86,20 @@ class Window():
         elif(obstacles[visible_obstacles[1]].z_pos < car.pos[1] + 500):
             visible_obstacles[1] += 1
 
-        
-        print(visible_obstacles)
-
         for i in range(visible_obstacles[0], min(visible_obstacles[1], len(obstacles))):
             self.draw_obstacle(obstacles[i])
         
         self.draw_speedometer(speedometer)
-        self.draw_car(car)
+        self.draw_car(car, False)
 
-    def draw_car(self, car: cl.Car):
+    def draw_car(self, car: cl.Car, adversary : bool):
         bottom_right = self.project((car.pos[0] + car.width/2, 0, car.pos[1]))
         top_left = self.project((car.pos[0] - car.width/2, car.width*car.aspect_ratio/self.vert_scale, car.pos[1]))
-
-        car.back = pygame.transform.rotate(pygame.transform.smoothscale(pygame.image.load("Images/back_gt40_{}.png".format(car.index)), (bottom_right[0] - top_left[0], bottom_right[1] - top_left[1])), 5 * car.orientation_bool).convert_alpha()
-        self.screen.blit(car.back, top_left)
+        if not adversary:
+            to_draw = pygame.transform.rotate(pygame.transform.smoothscale(car.my_image, (bottom_right[0] - top_left[0], bottom_right[1] - top_left[1])), 5 * car.orientation_bool).convert_alpha()
+        else:
+            to_draw = pygame.transform.rotate(pygame.transform.smoothscale(car.for_adversary, (bottom_right[0] - top_left[0], bottom_right[1] - top_left[1])), 5 * car.orientation_bool).convert_alpha()
+        self.screen.blit(to_draw, top_left)
 
 
         

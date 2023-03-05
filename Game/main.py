@@ -9,7 +9,7 @@ screen = pygame.display.set_mode(size)
 done = False
 clock = pygame.time.Clock()
 
-n_players = 1
+n_players = 2
 
 Cars = np.empty(n_players, dtype=cl.Car)
 Windows = np.empty(n_players, dtype=Window)
@@ -48,13 +48,15 @@ while not done:
     keys = pygame.key.get_pressed()
 
     screen.fill((105, 205, 4))
-
+    
     for i, car in enumerate(Cars):
         car.get_input(keys, dt, Controls[i])
         car.update_state(dt)
         if cl.check_collision(car, obstacles[visible_obstacles[i, 0]]) :
             car.speed *= obstacles[visible_obstacles[i, 0]].speed_multiplier
         Windows[i].draw_scene(car, obstacles, visible_obstacles[i,:], Speedometers[i])
+        if (n_players==2):
+            Windows[i].draw_adversary(car, Cars[(i+1)%2])
 
     img = font.render("%.2f"%time, True, (0, 0, 255))
     screen.blit(img, (20, 20))
