@@ -9,22 +9,29 @@ screen = pygame.display.set_mode(size)
 done = False
 clock = pygame.time.Clock()
 
-Car1 = cl.Car(0)
-Car1.set_speed(200)
-Car1.set_orientation(np.radians(90))
+n_players = 2
 
-Car2 = cl.Car(1)
-Car2.set_speed(200)
-Car2.set_orientation(np.radians(90))
+Cars = np.empty(n_players, dtype=cl.Car)
+Windows = np.empty(n_players, dtype=Window)
+visible_obstacles = np.zeros((n_players, 2), dtype=int)
+Speedometers = np.empty(n_players, dtype=cl.Speedometer)
 
-window1 = Window(screen, width, height, 0, 0, 0.5)
-window2 = Window(screen, width, height, 0, height/2, 0.5)
+Controls = [[pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN],
+           [pygame.K_q, pygame.K_d, pygame.K_z, pygame.K_s]]
+
+for i in range(n_players):
+    Cars[i] = cl.Car(i)
+    Cars[i].set_speed(200)
+    Cars[i].set_orientation(np.radians(90))
+
+    Windows[i] = Window(screen, width, height, 0, i * height/n_players, 1/n_players)
+
+    Speedometers[i] = cl.Speedometer(Cars[i], width, height)
+
 
 last_obstacle_z = 400
 n_obstacles = 100
 obstacles = np.empty(n_obstacles, dtype=cl.Obstacle)
-visible_obstacles1 = [0, 0]
-visible_obstacles2 = [0, 0]
 
 for i in range(n_obstacles):
     o = cl.generate_random_obstacle(last_obstacle_z)
@@ -35,29 +42,19 @@ time = 0
 pygame.font.init()
 font = pygame.font.SysFont(pygame.font.get_default_font(), 50)
 
-speedometer1 = cl.Speedometer(Car1, width, height)
-speedometer2 = cl.Speedometer(Car2, width, height)
-
 while not done:
     dt = clock.tick(60) * 1e-3
     time += dt
     keys = pygame.key.get_pressed()
 
-    Car1.get_input(keys, dt, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN)
-    Car1.update_state(dt)
-
-    Car2.get_input(keys, dt, pygame.K_q, pygame.K_d, pygame.K_z, pygame.K_s)
-    Car2.update_state(dt)
-
     screen.fill((105, 205, 4))
 
-    if cl.check_collision(Car1, obstacles, visible_obstacles1) :
-        Car1.speed *= obstacles[visible_obstacles1[0]].speed_multiplier
-    if cl.check_collision(Car2, obstacles, visible_obstacles2) :
-        Car2.speed *= obstacles[visible_obstacles2[0]].speed_multiplier
-
-    window1.draw_scene(Car1.pos, obstacles, visible_obstacles1, speedometer1, Car1)
-    window2.draw_scene(Car2.pos, obstacles, visible_obstacles2, speedometer2, Car2)
+    for i, car in enumerate(Cars):
+        car.get_input(keys, dt, Controls[i])
+        car.update_state(dt)
+        if cl.check_collision(car, obstacles[visible_obstacles[i, 0]]) :
+            car.speed *= obstacles[visible_obstacles[i, 0]].speed_multiplier
+        Windows[i].draw_scene(car, obstacles, visible_obstacles[i,:], Speedometers[i])
 
     img = font.render("%.2f"%time, True, (0, 0, 255))
     screen.blit(img, (20, 20))

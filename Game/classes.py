@@ -41,20 +41,20 @@ class Car:
         self.pos[0] += np.cos(self.orientation) * self.speed * dt 
         self.pos[1] += np.sin(self.orientation) * self.speed * dt
 
-    def get_input(self, keys, dt, left, right, up, down):
-        if keys[left]:
+    def get_input(self, keys, dt, controls):
+        if keys[controls[0]]:
             self.turn(1)
             self.orientation_bool = 1
-        elif keys[right]:
+        elif keys[controls[1]]:
             self.turn(-1)
             self.orientation_bool = -1
         else:
             self.turn(-0.05 * np.rad2deg(self.orientation - np.pi/2))
             self.orientation_bool = 0
 
-        if keys[up]:
+        if keys[controls[2]]:
             self.accelerate(10, dt)
-        elif keys[down]:
+        elif keys[controls[3]]:
             self.accelerate(-50, dt)
 
         if(abs(self.pos[0]) > 100):
@@ -79,11 +79,10 @@ class Speedometer:
 
 
 
-def check_collision(car : Car, obstacles, visible_obstacles):
-    for i in range(visible_obstacles[0], visible_obstacles[1]):
-        if(not obstacles[i].collided[car.index] and abs(car.pos[0] - obstacles[i].middle_x) < obstacles[i].length * 20 and abs(car.pos[1] - obstacles[i].z_pos) < 10):
-            obstacles[i].collided[car.index] = True
-            return True
+def check_collision(car : Car, obstacle):
+    if(not obstacle.collided[car.index] and abs(car.pos[0] - obstacle.middle_x) < obstacle.length * 20 and abs(car.pos[1] - obstacle.z_pos) < 10):
+        obstacle.collided[car.index] = True
+        return True
     return False
 
 class Obstacle:

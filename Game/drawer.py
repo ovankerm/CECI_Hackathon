@@ -68,20 +68,23 @@ class Window():
         tip_y = speedometer.needle_y - speedometer.needle_length * np.sin(angle)
         pygame.draw.line(self.screen, speedometer.needle_color, (speedometer.needle_x, speedometer.needle_y), (tip_x, tip_y), 3)
 
-    def draw_scene(self, player_position, obstacles, visible_obstacles, speedometer, car):
+    def draw_scene(self, car, obstacles, visible_obstacles, speedometer):
         pygame.draw.rect(self.screen, (105, 205, 4), pygame.Rect(self.orig_x, self.orig_y, self.width, self.height))
         
-        self.camera.x = player_position[0]
+        self.camera.x = car.pos[0]
         self.camera.y = 100
-        self.camera.z = player_position[1] - 30.01
-        self.draw_road(player_position)
+        self.camera.z = car.pos[1] - 30.01
+        self.draw_road(car.pos)
 
         if(obstacles[visible_obstacles[0]].z_pos < self.camera.z + 5):
             visible_obstacles[0] += 1
-        elif(obstacles[visible_obstacles[1]].z_pos < player_position[1] + 500):
+        elif(obstacles[visible_obstacles[1]].z_pos < car.pos[1] + 500):
             visible_obstacles[1] += 1
 
-        for i in range(visible_obstacles[0], visible_obstacles[1]):
+        
+        print(visible_obstacles)
+
+        for i in range(visible_obstacles[0], min(visible_obstacles[1], len(obstacles))):
             self.draw_obstacle(obstacles[i])
         
         self.draw_speedometer(speedometer)
