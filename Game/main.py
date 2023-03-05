@@ -10,7 +10,7 @@ size = width, height = 1024, 768
 screen = pygame.display.set_mode(size)
 done = False
 clock = pygame.time.Clock()
-Car1 = cl.Car()
+Car1 = cl.Car(1,width)
 Car1.set_speed(200)
 Car1.set_orientation(np.radians(90))
 
@@ -30,6 +30,8 @@ time = 0
 pygame.font.init()
 font = pygame.font.SysFont(pygame.font.get_default_font(), 50)
 
+speedometer = cl.Speedometer(Car1, width, height)
+
 while not done:
     dt = clock.tick(60) * 1e-3
     time += dt
@@ -38,10 +40,13 @@ while not done:
 
     if keys[pygame.K_LEFT]:
         Car1.turn(1)
+        Car1.orientation_bool = 1
     elif keys[pygame.K_RIGHT]:
         Car1.turn(-1)
+        Car1.orientation_bool = -1
     else:
         Car1.turn(-0.05 * np.rad2deg(Car1.orientation - np.pi/2))
+        Car1.orientation_bool = 0
 
     if keys[pygame.K_UP]:
         Car1.accelerate(10, dt)
@@ -60,7 +65,7 @@ while not done:
 
     if cl.check_collision(Car1, obstacles, visible_obstacles) :
         Car1.speed *= obstacles[visible_obstacles[0]].speed_multiplier
-    window.draw_scene(Car1.pos, obstacles, visible_obstacles)
+    window.draw_scene(Car1.pos, obstacles, visible_obstacles, speedometer, Car1)
     
     pygame.display.flip()
 
