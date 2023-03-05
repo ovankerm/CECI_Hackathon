@@ -68,7 +68,7 @@ class Window():
         tip_y = speedometer.needle_y - speedometer.needle_length * np.sin(angle)
         pygame.draw.line(self.screen, speedometer.needle_color, (speedometer.needle_x, speedometer.needle_y), (tip_x, tip_y), 3)
 
-    def draw_scene(self, player_position, obstacles, visible_obstacles):
+    def draw_scene(self, player_position, obstacles, visible_obstacles, speedometer, car):
         pygame.draw.rect(self.screen, (105, 205, 4), pygame.Rect(self.orig_x, self.orig_y, self.width, self.height))
         
         self.camera.x = player_position[0]
@@ -89,15 +89,10 @@ class Window():
 
     def draw_car(self, car: cl.Car):
         bottom_right = self.project((car.pos[0] + car.width/2, 0, car.pos[1]))
-        top_left = self.project((car.pos[0] - car.width/2, car.width*162/293, car.pos[1]))
+        top_left = self.project((car.pos[0] - car.width/2, car.width/self.vert_scale * 162/293, car.pos[1]))
 
-        # self.length = (int) (self.width*645/293)
-        # self.height = (int) (self.width*162/293)
-        # self.side = pygame.transform.smoothscale(pygame.image.load("Images/side_gt40_{}.png".format(1)), (self.length, self.height)).convert_alpha()
         car.back = pygame.transform.rotate(pygame.transform.smoothscale(pygame.image.load("Images/back_gt40_{}.png".format(1)), (bottom_right[0] - top_left[0], bottom_right[1] - top_left[1])), 5 * car.orientation_bool).convert_alpha()
-
         self.screen.blit(car.back, top_left)
-        #self.screen.blit(car.side, (self.width/2, self.height-150))
 
 
         

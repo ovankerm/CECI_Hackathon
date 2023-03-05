@@ -16,11 +16,6 @@ class Car:
         self.top_speed = 300
         self.orientation_bool = 0
         self.width = 200 / 5.1
-        self.length = (int) (self.width*645/293)
-        self.height = (int) (self.width*162/293)
-        self.side = pg.transform.smoothscale(pg.image.load("Images/side_gt40_{}.png".format(i)), (self.length, self.height)).convert_alpha()
-        self.back = pg.transform.smoothscale(pg.image.load("Images/back_gt40_{}.png".format(i)), (self.width, self.height)).convert_alpha()
-
 
     def accelerate(self, acc, dt):
         self.speed += acc * dt
@@ -49,10 +44,13 @@ class Car:
     def get_input(self, keys, dt, left, right, up, down):
         if keys[left]:
             self.turn(1)
+            self.orientation_bool = 1
         elif keys[right]:
             self.turn(-1)
+            self.orientation_bool = -1
         else:
             self.turn(-0.05 * np.rad2deg(self.orientation - np.pi/2))
+            self.orientation_bool = 0
 
         if keys[up]:
             self.accelerate(10, dt)
