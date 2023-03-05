@@ -3,7 +3,7 @@ import pygame
 import cv2
 import mediapipe as mp
 import numpy as np
-from Finger_Detection import process_img_fingers
+from Finger_Detection import process_single_img_fingers
 import threading
 import multiprocessing
 import copy
@@ -65,8 +65,9 @@ class multi:
             success, img = cap.read()
             if not success:
                 raise Exception
+            img = cv2.flip(img, 1)
 
-            process_img_fingers(img, self.finger_counter)
+            process_single_img_fingers(img, self.finger_counter)
 
             # FPS counter
             cur_time = time.time()
