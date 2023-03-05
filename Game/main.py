@@ -11,8 +11,7 @@ size = width, height = 1024, 768
 screen = pygame.display.set_mode(size)
 done = False
 clock = pygame.time.Clock()
-
-Car1 = cl.Car(0)
+Car1 = cl.Car(1,width)
 Car1.set_speed(200)
 Car1.set_orientation(np.radians(90))
 
@@ -37,6 +36,8 @@ for i in range(n_obstacles):
 time = 0
 pygame.font.init()
 font = pygame.font.SysFont(pygame.font.get_default_font(), 50)
+
+speedometer = cl.Speedometer(Car1, width, height)
 
 while not done:
     dt = clock.tick(60) * 1e-3
@@ -63,7 +64,7 @@ while not done:
     screen.blit(img, (20, 20))
     
     pygame.draw.circle(screen, [255, 255, 255], [width/2 + Car1.pos[0], height/2], 10)
-    speedometer = Speedometer(Car1, width, width)
+    speedometer = Speedometer(Car1, width, width, speedometer, Car1)
     speedometer.render(screen)
     pygame.display.flip()
 
