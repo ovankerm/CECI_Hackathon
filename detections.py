@@ -2,7 +2,6 @@ import cv2
 import dlib
 from scipy.spatial import distance
 import mediapipe as mp
-import time
 from imutils import face_utils
 
 
@@ -162,6 +161,7 @@ def face_detector_singleIMG_single(fdu: face_detection_utils):
             fdu.l_mouth_counter = 0
         fdu.result[0][0] = fdu.l_eye_counter >= fdu.treshold
         fdu.result[0][1] = fdu.l_mouth_counter >= fdu.treshold
+        print(fdu.result[0])
 
     cv2.imshow("Image", img)
     cv2.waitKey(fdu.waitKey)
